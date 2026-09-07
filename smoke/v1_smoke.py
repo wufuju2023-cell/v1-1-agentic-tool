@@ -14,6 +14,13 @@ sys.path.insert(0, str(ROOT.parent / "driver"))
 
 from v1_contract import Evidence, RingEvent, evidence_composite
 from v1_transports import make_transport, OpencodeEvidenceBackend
+from runtime_transport import RuntimeTransport
+
+
+def make_transport_for(transport: str, base: str):
+    if transport == "runtime":
+        return RuntimeTransport(base)
+    return make_transport()
 
 
 def plausible_prompt(problem: dict, related: list[str]) -> str:
@@ -45,15 +52,19 @@ def run_one(problem: dict, transport) -> dict:
 
 
 def main():
-    transport = make_transport()
+    transport = os.environ.get("V11_TRANSPORT", "mock")
+    base = os.environ.get("V11_POLICY_URL", "http://127.0.0.1:8760")
+    t = make_transport_for(transport, base)
     problems = json.loads((ROOT / "problems.json").read_text())
-    print(f"[v1-smoke] transport={type(transport).__name__} problems={len(problems)}")
+    print(f"[v1-smoke] transport={type(t).__name__} problems={len(problems)}")
     rows = []
     for p in problems:
-        r = run_one(p, transport)
+        if transport == "runtime":
+            r = t.run_problem(p)
+        else:
+            r = run_one(p, t)
         rows.append(r)
-        print(f"  - {r['id']:44s} candidates={r['candidates']:<2d} value={r['value']:.4f} "
-              f"phi={r['phi']:.4f} ok={r['ok']} {r['wall_ms']}ms")
+        print(f"  - {r['id']:44s} candidates={r['candidates']:<2d} value={r['value']:.4f} ok={r['ok']} {r['wall_ms']}ms")
     n_ok = sum(1 for r in rows if r["ok"])
     assert n_ok == len(rows), f"smoke FAIL {n_ok}/{len(rows)}"
     print(f"[v1-smoke] PASS {n_ok}/{len(rows)}")
