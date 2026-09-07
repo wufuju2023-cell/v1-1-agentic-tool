@@ -22,7 +22,7 @@ inductive EvidenceKind where
   | fileSearch   -- repo 文件导航读取
   | toolCall     -- 计算/验证工具（lake env lean、arity 检查等）
   | manual
-  deriving DecidableEq, Repr
+  deriving DecidableEq, Repr, Inhabited
 
 instance : ToString EvidenceKind where
   toString
@@ -55,6 +55,7 @@ structure Evidence where
   weight : Float
   payload : Json
   sourceDesc : String
+  deriving Inhabited
 
 instance : ToJson Evidence where
   toJson e :=
