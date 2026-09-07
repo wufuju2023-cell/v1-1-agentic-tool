@@ -1,0 +1,17 @@
+name = "reapAgentic"
+defaultTargets = ["Reap"]
+
+[leanOptions]
+pp.unicode.fun = true
+experimental.module = true
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+rev = "v4.28.0"
+
+[[lean_lib]]
+name = "Reap"
+
+[[lean_lib]]
+name = "Reap.Test"

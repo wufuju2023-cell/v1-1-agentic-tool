@@ -1,0 +1,23 @@
+# build artifacts
+cpulean/.lake/
+cpulean/*.olean
+*.olean
+**/.lake/**
+.lake/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# os
+.DS_Store
+Thumbs.db
+
+# local scratch
+smoke/.tmp/
+tests/.tmp/
+
+# lean direct-build output
+.build/
